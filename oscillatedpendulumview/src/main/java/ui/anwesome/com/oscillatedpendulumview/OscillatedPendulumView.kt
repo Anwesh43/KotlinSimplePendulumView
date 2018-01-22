@@ -7,6 +7,8 @@ import android.app.Activity
 import android.view.*
 import android.content.*
 import android.graphics.*
+import android.util.Log
+
 class OscillatedPendulumView(ctx:Context):View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     val renderer = OscillatedPendulumRenderer(this)
@@ -30,7 +32,8 @@ class OscillatedPendulumView(ctx:Context):View(ctx) {
             state.executeFn {
                 canvas.rotate(it)
             }
-            paint.strokeWidth = r/7
+            paint.strokeWidth = r/4
+            paint.strokeCap = Paint.Cap.ROUND
             canvas.drawLine(0f,0f,0f,l,paint)
             canvas.drawCircle(0f,l+r,r,paint)
             canvas.restore()
@@ -49,17 +52,21 @@ class OscillatedPendulumView(ctx:Context):View(ctx) {
                 scale = dir
                 dir *= -1
             }
-            if(deg == 0f && scale > 0) {
-                dir = 0f
-                scale = 0f
-                deg = 0f
-                stopcb()
+            if(scale >= 0f && scale < 0.1f && dir == 1f) {
+                deg-=15
+                Log.d("degrees:","$deg")
+                if(deg == 0f) {
+                    dir = 0f
+                    scale = 0f
+                    stopcb()
+                }
             }
         }
         fun startUpdating(startcb:()->Unit) {
             if(dir == 0f) {
-                deg = 90f
+                deg = 75f
                 dir = 1 - 2 * scale
+                scale = 0.1f
                 startcb()
             }
         }
