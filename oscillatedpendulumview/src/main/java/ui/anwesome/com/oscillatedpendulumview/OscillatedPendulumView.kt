@@ -3,6 +3,7 @@ package ui.anwesome.com.oscillatedpendulumview
 /**
  * Created by anweshmishra on 22/01/18.
  */
+import android.app.Activity
 import android.view.*
 import android.content.*
 import android.graphics.*
@@ -88,6 +89,37 @@ class OscillatedPendulumView(ctx:Context):View(ctx) {
             if(!animated) {
                 animated = true
             }
+        }
+    }
+    class OscillatedPendulumRenderer(var view:OscillatedPendulumView,var time:Int = 0) {
+        var oscillatedPendulum:OscillatedPendulum?=null
+        val animator = OscillatedAnimator(view)
+        fun render(canvas:Canvas,paint:Paint) {
+            if(time == 0) {
+                val w = canvas.width.toFloat()
+                val h = canvas.height.toFloat()
+                oscillatedPendulum = OscillatedPendulum(w/2,h/2,w/3,w/20)
+            }
+            canvas.drawColor(Color.parseColor("#212121"))
+            oscillatedPendulum?.draw(canvas,paint)
+            time++
+            animator.animate {
+                oscillatedPendulum?.update {
+                    animator.stop()
+                }
+            }
+        }
+        fun handleTap() {
+            oscillatedPendulum?.startUpdating {
+                animator.start()
+            }
+        }
+    }
+    companion object {
+        fun create(activity:Activity):OscillatedPendulumView {
+            val view = OscillatedPendulumView(activity)
+            activity.setContentView(view)
+            return view
         }
     }
 }
