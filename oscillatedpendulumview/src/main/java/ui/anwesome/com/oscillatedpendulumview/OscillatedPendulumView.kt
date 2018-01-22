@@ -37,4 +37,29 @@ class OscillatedPendulumView(ctx:Context):View(ctx) {
 
         }
     }
+    data class OscillatedPendulumState(var deg:Float = 0f,var scale:Float = 0f,var dir:Float = 0f) {
+        fun update(stopcb:()->Unit) {
+            scale += 0.1f*dir
+            if(Math.abs(scale) > 1) {
+                scale = dir
+                dir *= -1
+            }
+            if(deg == 0f && scale > 0) {
+                dir = 0f
+                scale = 0f
+                deg = 0f
+                stopcb()
+            }
+        }
+        fun startUpdating(startcb:()->Unit) {
+            if(dir == 0f) {
+                deg = 90f
+                dir = 1 - 2 * scale
+                startcb()
+            }
+        }
+        fun executeFn(cb:(Float)->Unit) {
+            cb(deg*scale)
+        }
+    }
 }
